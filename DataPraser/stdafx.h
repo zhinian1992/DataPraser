@@ -52,3 +52,4 @@
 #endif
 
 
+#define WM_WRITELOG		WM_USER+0x1000

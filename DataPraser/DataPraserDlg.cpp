@@ -6,11 +6,13 @@
 #include "DataPraser.h"
 #include "DataPraserDlg.h"
 #include "afxdialogex.h"
+#include "PraseCenter.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+PraseCenter praser;
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -64,6 +66,11 @@ BEGIN_MESSAGE_MAP(CDataPraserDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_OPEN_FILE, &CDataPraserDlg::OnBnClickedButtonOpenFile)
+	ON_BN_CLICKED(IDC_BUTTON_SELECT_TEMPLETE, &CDataPraserDlg::OnBnClickedButtonSelectTemplete)
+	ON_BN_CLICKED(IDC_BUTTON_SAVE_PATH, &CDataPraserDlg::OnBnClickedButtonSavePath)
+	ON_BN_CLICKED(IDC_BUTTON_PRASE, &CDataPraserDlg::OnBnClickedButtonPrase)
+	ON_MESSAGE(WM_WRITELOG,&CDataPraserDlg::OnLogMessage)
 END_MESSAGE_MAP()
 
 
@@ -99,6 +106,11 @@ BOOL CDataPraserDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	GetDlgItem(IDC_EDIT_SAVE_PATH)->SetWindowText("默认保存路径为待解析文件同级目录");
+
+	CheckRadioButton(IDC_RADIO1,IDC_RADIO2,IDC_RADIO1);
+
+	praser.SetLogReceiver(this->GetSafeHwnd());
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -152,3 +164,96 @@ HCURSOR CDataPraserDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+/// <summary>
+/// load files button clicked
+/// </summary>
+void CDataPraserDlg::OnBnClickedButtonOpenFile()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	GetDlgItem(IDC_EDIT_FILE)->SetWindowText("");
+
+	std::vector<CString> files = praser.LoadDataFiles();
+	if(!files.empty()){
+		CString sALL;
+		std::vector<CString>::iterator iter = files.begin();
+		for(;iter != files.end();iter++){
+			sALL.Append("\<");
+			sALL.Append(*iter);
+			sALL.Append("\>");
+		}
+		GetDlgItem(IDC_EDIT_FILE)->SetWindowText(sALL);
+	}
+	else{
+		MessageBox("Error:load files failed!");
+	}
+
+}
+
+/// <summary>
+/// load templete file button clicked
+/// </summary>
+void CDataPraserDlg::OnBnClickedButtonSelectTemplete()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	GetDlgItem(IDC_EDIT_TEMPLETE)->SetWindowText("");
+
+	CString file = praser.LoadTempleteFile();
+
+	if(file.IsEmpty()){
+		MessageBox("Error:load templete file failed!");
+	}
+	else{
+		GetDlgItem(IDC_EDIT_TEMPLETE)->SetWindowText(file);
+	}
+}
+
+
+void CDataPraserDlg::OnBnClickedButtonSavePath()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	GetDlgItem(IDC_EDIT_SAVE_PATH)->SetWindowText("");
+
+	CString file = praser.SetSaveFilePath();
+
+	if(file.IsEmpty()){
+		MessageBox("Error:set save file path failed!");
+	}
+	else{
+		GetDlgItem(IDC_EDIT_SAVE_PATH)->SetWindowText(file);
+	}
+}
+
+
+void CDataPraserDlg::OnBnClickedButtonPrase()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (((CButton *)GetDlgItem(IDC_RADIO2))->GetCheck()){
+		praser.SetDataFileType(true);
+
+		CString split;
+		GetDlgItemText(IDC_EDIT_SPLIT,split);
+		if(split.IsEmpty()){
+			MessageBox("Error:multiple data prasing , spilt charactor cannot be null!");
+			return;
+		}
+		else{
+			praser.SetMultipleDataSplit(split);
+		}	
+	}
+	if(!praser.ParseDataFiles())
+		MessageBox("Error:prase data file failed!");
+}
+
+/// <summary>
+/// write log message handler
+///	add message to the end of IDC_EDIT_LOG 
+/// </summary>
+LRESULT CDataPraserDlg::OnLogMessage(WPARAM wParam, LPARAM lParam)
+{
+	CString *log;
+	log = (CString *)lParam;
+	((CEdit*)GetDlgItem(IDC_EDIT_LOG))->SetSel(GetDlgItem(IDC_EDIT_LOG)->GetWindowTextLength(),GetDlgItem(IDC_EDIT_LOG)->GetWindowTextLength());
+	((CEdit*)GetDlgItem(IDC_EDIT_LOG))->ReplaceSel((LPCTSTR)*log);
+	return 0;
+}

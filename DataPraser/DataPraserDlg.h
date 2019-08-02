@@ -31,4 +31,11 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedButtonOpenFile();
+	afx_msg void OnBnClickedButtonSelectTemplete();
+	afx_msg void OnBnClickedButtonSavePath();
+	afx_msg void OnBnClickedButtonPrase();
+
+	afx_msg LRESULT OnLogMessage(WPARAM wParam, LPARAM lParam);
 };
