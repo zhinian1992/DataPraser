@@ -16,8 +16,7 @@ void ReportParagraph::SetValueByPraseNode(TiXmlNode *node)
 {
 	assert(node);
 
-	SetName(GetNodeAttributeStringValue(node,"name"));
-	SetNode(GetNodeAttributeStringValue(node,"node"));
+	SetSplit(GetNodeAttributeStringValue(node, "split"));
 }
 
 /// <summary>
@@ -42,8 +41,8 @@ CString ReportParagraph::GetNodeAttributeStringValue(TiXmlNode *node,CString att
 	TiXmlElement *ele =  node->ToElement();
 	TiXmlAttribute *pAttr = ele->FirstAttribute();
 	while(pAttr){
-		if(pAttr->Value() == attributeName){
-			return pAttr->Value();
+		if(pAttr->NameTStr() == attributeName){
+			return ChangeCStringToCharacter(pAttr->Value());
 		}
 		else 
 			pAttr = pAttr->Next();
@@ -60,7 +59,7 @@ bool ReportParagraph::GetNodeAttributeBoolValue(TiXmlNode *node,CString attribut
 	TiXmlElement *ele =  node->ToElement();
 	TiXmlAttribute *pAttr = ele->FirstAttribute();
 	while(pAttr){
-		if(pAttr->Value() == attributeName){
+		if(pAttr->NameTStr() == attributeName){
 			return pAttr->IntValue();
 		}
 		else 
@@ -78,11 +77,35 @@ int ReportParagraph::GetNodeAttributeIntValue(TiXmlNode *node,CString attributeN
 	TiXmlElement *ele =  node->ToElement();
 	TiXmlAttribute *pAttr = ele->FirstAttribute();
 	while(pAttr){
-		if(pAttr->Value() == attributeName){
+		if(pAttr->NameTStr() == attributeName){
 			return pAttr->IntValue();
 		}
 		else 
 			pAttr = pAttr->Next();
 	}
 	return 0;
+}
+
+/// <summary>
+/// Change CString to character such as \t \n \r \r\n \r\n\r\n
+/// </summary>
+/// <param name="str"></param>
+CString ReportParagraph::ChangeCStringToCharacter(CString str)
+{
+	if (str.Compare("\\r\\n") == 0) {
+		return "\r\n";
+	}
+	else if (str.Compare("\\r\\n\\r\\n") == 0) {
+		return "\r\n\r\n";
+	}
+	else if (str.Compare("\\n") == 0) {
+		return "\n";
+	}
+	else if (str.Compare("\\r") == 0) {
+		return "\r";
+	}
+	else if (str.Compare("\\t") == 0) {
+		return "\t";
+	}
+	return str;
 }

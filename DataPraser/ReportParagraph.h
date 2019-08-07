@@ -1,5 +1,6 @@
 #pragma once
 
+class TiXmlElement;
 class TiXmlNode;
 class ReportParagraph
 {
@@ -9,15 +10,13 @@ public:
 
 	virtual void SetValueByPraseNode(TiXmlNode *node);
 
-	CString GetNode(){ return m_node; }
-	void SetNode(CString node){ m_node =  node; }
+	virtual TiXmlElement* parse(CString &data) = 0;
 
-	CString GetName(){ return m_name; }
-	void SetName(CString name){ m_name =  name; }
+	CString GetSplit() { return m_split; }
+	void SetSplit(CString split) { m_split = split; }
 
-private:
-	CString m_node;
-	CString m_name;
+protected:
+	CString m_split;
 
 protected:
 	CString GetChildNodeValue(TiXmlNode *parent,CString nodeName);
@@ -27,5 +26,8 @@ protected:
 	bool GetNodeAttributeBoolValue(TiXmlNode *node,CString attributeName);
 
 	int GetNodeAttributeIntValue(TiXmlNode *node,CString attributeName);
+
+private:
+	CString ChangeCStringToCharacter(CString str);
 };
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TempletePraser.h"
-#include "ReportControlFactory.h"
+#include "ReportTitle.h"
+#include "ReportItem.h"
 #include "PraseCenter.h"
 #include "tinyxml.h"
 #include <string>
@@ -32,22 +33,37 @@ bool TempletePraser::PraseTempleteFile(CString &file)
 		return false;
 	}
 
-	TiXmlNode *node = doc.RootElement();
+	TiXmlNode *root = doc.RootElement();
+	assert(root);
+
+	/*Prase Title node*/
+	TiXmlNode *node = root->FirstChild("Title");
 	assert(node);
+	shared_ptr<ReportTitle> ptr = make_shared<ReportTitle>();
+	ptr->SetValueByPraseNode(node);
+	m_praseCenter.SetTitleValue(ptr);
 
-	node = node->FirstChild();
+	/*Prase keywords node*/
+	node = root->FirstChild("Keywords");
+	assert(node);
+	TiXmlElement *ele = node->FirstChildElement("key");
+	while(ele){
+		CString key = ele->GetText();
+		CString name = ele->FirstAttribute()->Value();
+		m_praseCenter.AddParagraph(key, name);
 
-	while(node){
-		ReportControlFactory RCtrl;
-		shared_ptr<ReportParagraph> ptr = RCtrl.PraseParagraphNode(node);
+		ele = ele->NextSiblingElement();
+	}
 
-		if(!ptr){
-			m_praseCenter.WriteLog("Error:Prase Templete file failed ! the type of node is not exist");
-			return false;
-		}
-		m_praseCenter.AddParagraph(ptr);
+	/*Prase file fomate node*/
+	node = root->FirstChild("FileFormat");
+	assert(node);
+	ele = node->FirstChildElement();
+	while (ele) {
+		CString para = ele->GetText();
+		m_praseCenter.AddFileFormat(para);
 
-		node = node->NextSibling();
+		ele = ele->NextSiblingElement();
 	}
 
 	return true;

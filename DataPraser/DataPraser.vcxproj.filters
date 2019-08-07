@@ -51,9 +51,6 @@
     <ClInclude Include="ReportItem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ReportList.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ReportControlFactory.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -96,9 +93,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ReportItem.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ReportList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ReportControlFactory.cpp">

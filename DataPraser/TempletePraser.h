@@ -4,7 +4,8 @@
 
 class TiXmlNode;
 class PraseCenter;
-class ReportParagraph;
+class ReportTitle;
+class ReportItem;
 class TempletePraser
 {
 private:

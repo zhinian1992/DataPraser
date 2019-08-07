@@ -10,10 +10,7 @@ public:
 
 	virtual void SetValueByPraseNode(TiXmlNode *node);
 
-	CString GetSplite(){ return m_spilt; }
-	void SetSplite(CString split){ m_spilt =  split; }
+	virtual TiXmlElement* parse(CString &data);
 
-private:
-	CString m_spilt;
 };
 
