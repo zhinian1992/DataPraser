@@ -259,8 +259,6 @@ void PraseCenter::PraseFileData()
 			}
 			else if ((*iter_formate).Compare("Details") == 0)
 			{
-				RemoveSpecialCharacter((*iter));
-
 				TiXmlElement* ele_detail = new TiXmlElement("Details");
 				/*get the pos of all the keys in data*/
 				map<CString,CString>::iterator iter_map = m_keyMap.begin();
@@ -276,6 +274,15 @@ void PraseCenter::PraseFileData()
 				}
 				sort(posArry.begin(), posArry.end());
 
+				if (!posArry.empty()) {
+					if (posArry[0] > 10) {
+						TiXmlElement* ele_ex = new TiXmlElement("Note");
+						ele_ex->LinkEndChild(new TiXmlText((*iter).Left(posArry[0])));
+						assert(ele_ex);
+						element->LinkEndChild(ele_ex);
+					}
+				}	
+
 				vector<int>::iterator iter_pos = posArry.begin();
 				map<int, CString>::iterator iter_key;
 				for (; iter_pos != posArry.end(); iter_pos++) {
@@ -287,6 +294,8 @@ void PraseCenter::PraseFileData()
 						data = (*iter).Mid(*iter_pos, *(iter_pos + 1) - *iter_pos);
 					else
 						data = (*iter).Right((*iter).GetLength() - *iter_pos);
+
+					RemoveCharacteristic(data);
 
 					TiXmlElement* ele = new TiXmlElement((*iter_key).second);
 					ele->LinkEndChild(new TiXmlText(data));
@@ -307,11 +316,13 @@ void PraseCenter::saveXMl2File(CString &fileName)
 	TiXmlDocument *doc = new TiXmlDocument;
 	TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "", "");
 	doc->LinkEndChild(decl);
+	TiXmlElement* root = new TiXmlElement("root");
+	doc->LinkEndChild(root);
 
 	vector<TiXmlElement*>::iterator iter = m_vElement.begin();
 	for (; iter != m_vElement.end(); iter++)
 	{
-		doc->LinkEndChild(*iter);
+		root->LinkEndChild(*iter);
 	}
 
 	doc->SaveFile(fileName);
@@ -325,10 +336,15 @@ void PraseCenter::saveXMl2File(CString &fileName)
 /// Remove \r \n from CString
 /// </summary>
 /// <param name="data"></param>
-void PraseCenter::RemoveSpecialCharacter(CString& data)
+void PraseCenter::RemoveCharacteristic(CString& data)
 {
+	data.Remove('\t');
 	data.Remove('\r');
 	data.Remove('\n');
-	data.Remove(' ');
-	//data.Remove('\t');
+
+	const size_t last_slash_idx = data.Find("]");
+
+	assert(last_slash_idx!=std::string::npos);
+
+	data = data.Right(data.GetLength() - last_slash_idx);
 }

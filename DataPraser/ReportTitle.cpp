@@ -47,6 +47,10 @@ TiXmlElement* ReportTitle::parse(CString &data)
 	}
 	data = data.Right(data.GetLength() - iEnd);
 
+	cstr.Remove('\t');
+	cstr.Remove('\r');
+	cstr.Remove('\n');
+
 	TiXmlElement* ele = new TiXmlElement("title");
 	ele->LinkEndChild(new TiXmlText(cstr));
 

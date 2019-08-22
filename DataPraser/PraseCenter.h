@@ -44,7 +44,7 @@ private:
 
 	void saveXMl2File(CString &fileName);
 
-	void RemoveSpecialCharacter(CString& data);
+	void RemoveCharacteristic(CString& data);
 
 private:
 	HWND m_hWnd;
